@@ -38,5 +38,5 @@ hash -r 2> /dev/null' > "$VENV_BIN_DIR/activate"
 # shellcheck disable=SC2016
 echo '#!/usr/bin/env bash
 # shellcheck disable=SC2068
-podman run --rm -v "$PWD":/src:Z -w /src ghdl/ghdl:'"$GHDL_TAG"' ghdl $@' > "$VENV_BIN_DIR/ghdl"
+podman run --rm -v "$PWD":/src:Z -w /src ghdl/ghdl:'"$GHDL_TAG"' ghdl "$@"' > "$VENV_BIN_DIR/ghdl"
 chmod +x "$VENV_BIN_DIR/ghdl"

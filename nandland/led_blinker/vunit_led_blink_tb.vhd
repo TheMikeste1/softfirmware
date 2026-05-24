@@ -16,7 +16,7 @@ begin
 
     test_runner_setup(runner, runner_cfg);
     report "Hello world!";
-    test_runner_cleanup(runner); -- Simulation ends here
+    test_runner_cleanup(runner);
 
   end process main;
 
