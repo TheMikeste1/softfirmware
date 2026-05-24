@@ -5,6 +5,6 @@ podman run --rm \
     -w /src \
     ghdl/vunit:gcc \
 sh -c '
-    VUNIT_SIMULATOR=ghdl; \
-    for f in $(find ./ -name 'run.py'); do python3 $f; done \
-  '
+        export VUNIT_SIMULATOR=ghdl
+        find . -name run.py -exec python3 {} "$@" \;
+    ' sh "$@"
