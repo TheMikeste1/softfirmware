@@ -1,0 +1,9 @@
+[libraries]
+vunit_lib.files = ["./.venv/lib64/python3.14/site-packages/vunit/vhdl/**/*.vhd"]
+vunit_lib.is_third_party = true
+
+# Optional: OSVVM (if used with VUnit)
+# osvvm.files = [
+#     "path/to/osvvm/**/*.vhd"
+# ]
+# osvvm.is_third_party = true
