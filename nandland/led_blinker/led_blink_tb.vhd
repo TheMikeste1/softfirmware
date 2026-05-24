@@ -60,7 +60,7 @@ begin
   main_testing : process is
   begin
 
-    r_enable <= '0';
+    r_reset <= '0';
     r_enable <= '1';
 
     r_switch_1 <= '0';

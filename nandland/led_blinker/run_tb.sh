@@ -13,8 +13,7 @@ ghdl -e led_blink_tb
 
 echo "Run simulation"
 
-ghdl -r led_blink_tb --vcd=wave.vcd || true
+ghdl -r led_blink_tb --fst=wave.fst || true
 
-echo "Waveform file written to: wave.vcd"
-echo "To view it, run: gtkwave wave.vcd"
-
+echo "Waveform file written to: wave.fst"
+echo "To view it, run: gtkwave --dark wave.fst"

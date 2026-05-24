@@ -6,3 +6,6 @@
 *_tb
 *_testbench
 *.vcd
+*.fst
+*.hier
+*.ghw
