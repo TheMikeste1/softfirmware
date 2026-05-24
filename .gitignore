@@ -1,1 +1,8 @@
 .venv_ghdl/
+*.o
+*.pp
+*.te
+*.cf
+*_tb
+*_testbench
+*.vcd
