@@ -5,6 +5,9 @@ library ieee;
 library vunit_lib;
   context vunit_lib.vunit_context;
 
+library osvvm;
+  context osvvm.osvvmcontext;
+
 entity led_blink_tb is
   generic (
     runner_cfg : string
@@ -26,7 +29,6 @@ architecture behave of led_blink_tb is
   signal w_led_drive : std_ulogic;
   -- vsg_on signal_007
 
-  -- Component declaration for the Unit Under Test (UUT)
   component led_blink is
     port (
       i_clock     : in    std_logic;
@@ -40,7 +42,6 @@ architecture behave of led_blink_tb is
 
 begin
 
-  -- Instantiate the Unit Under Test (UUT)
   uut : component led_blink
     port map (
       i_clock     => r_clock,
@@ -51,7 +52,6 @@ begin
       o_led_drive => w_led_drive
     );
 
-  -- Separate concurrent process outside main
   clk_proc : process is
   begin
 
@@ -59,7 +59,6 @@ begin
 
       r_clock <= '0';
       wait for c_clock_period / 2;
-
       r_clock <= '1';
       wait for c_clock_period / 2;
 
@@ -71,15 +70,22 @@ begin
 
   main : process is
 
+    variable v_switch_cov : coverageidtype;
+
     procedure run_blink_test (
       constant switch_1  : in std_logic;
       constant switch_2  : in std_logic;
       constant low_time  : in time;
       constant high_time : in time
     ) is
+
+      variable v_switch_combo : integer;
+
     begin
 
-      -- Set the stimulus
+      v_switch_combo := to_integer(unsigned(std_logic_vector'(switch_1 & switch_2)));
+      ICover(v_switch_cov, v_switch_combo);
+
       r_reset    <= '0';
       r_enable   <= '1';
       r_switch_1 <= switch_1;
@@ -112,6 +118,13 @@ begin
 
     test_runner_setup(runner, runner_cfg);
 
+    -- NewID registers this coverage model with the singleton and returns a handle.
+    v_switch_cov := NewID("switch_combinations");
+    AddBins(v_switch_cov, "100Hz (SW=00)", GenBin(0));
+    AddBins(v_switch_cov, "50Hz  (SW=01)", GenBin(1));
+    AddBins(v_switch_cov, "10Hz  (SW=10)", GenBin(2));
+    AddBins(v_switch_cov, "1Hz   (SW=11)", GenBin(3));
+
     while test_suite loop
 
       if run("100Hz blink") then
@@ -125,6 +138,8 @@ begin
       end if;
 
     end loop;
+
+    WriteBin(v_switch_cov);
 
     test_runner_cleanup(runner);
 

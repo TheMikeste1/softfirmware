@@ -6,6 +6,7 @@ from vunit import VUnit
 
 vu = VUnit.from_argv(compile_builtins=False)
 vu.add_vhdl_builtins()
+vu.add_osvvm()
 
 # Silence GHDL warnings for VUnit internals
 vu.set_compile_option(

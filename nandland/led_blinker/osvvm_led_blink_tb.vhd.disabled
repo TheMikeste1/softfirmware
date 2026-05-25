@@ -1,0 +1,201 @@
+library ieee;
+  use ieee.std_logic_1164.all;
+  use ieee.numeric_std.all;
+
+library vunit_lib;
+  context vunit_lib.vunit_context;
+
+library osvvm;
+  context osvvm.osvvmcontext;
+
+entity led_blink_random_tb is
+  generic (
+    runner_cfg : string
+  );
+end entity led_blink_random_tb;
+
+architecture behave of led_blink_random_tb is
+
+  constant c_clock_period : time := 40 ns;
+
+  -- vsg_off signal_007
+  signal clock_run   : boolean    := true;
+  signal r_clock     : std_ulogic := '0';
+  signal r_reset     : std_ulogic := '1';
+  signal r_enable    : std_ulogic := '0';
+  signal r_switch_1  : std_ulogic := '0';
+  signal r_switch_2  : std_ulogic := '0';
+  signal w_led_drive : std_ulogic;
+  -- vsg_on signal_007
+
+  component led_blink is
+    port (
+      i_clock     : in    std_logic;
+      i_reset     : in    std_logic;
+      i_enable    : in    std_logic;
+      i_switch_1  : in    std_logic;
+      i_switch_2  : in    std_logic;
+      o_led_drive : out   std_logic
+    );
+  end component led_blink;
+
+begin
+
+  uut : component led_blink
+    port map (
+      i_clock     => r_clock,
+      i_reset     => r_reset,
+      i_enable    => r_enable,
+      i_switch_1  => r_switch_1,
+      i_switch_2  => r_switch_2,
+      o_led_drive => w_led_drive
+    );
+
+  clk_proc : process is
+  begin
+
+    while clock_run loop
+
+      r_clock <= '0';
+      wait for c_clock_period / 2;
+
+      r_clock <= '1';
+      wait for c_clock_period / 2;
+
+    end loop;
+
+    wait;
+
+  end process clk_proc;
+
+  main : process is
+
+    -- RandomPType auto-initializes with a time-based seed.  Calling InitSeed
+    -- with the instance name instead gives a reproducible but hierarchy-unique
+    -- seed, which is useful for debugging a specific failing run.
+    variable rv           : randomptype;
+    variable v_switch_cov : coverageidtype;
+    variable v_combo      : integer;
+    variable v_start      : time;
+
+    -- Returns the expected low-phase duration for a given switch combo.
+    -- The DUT counts to N-1 before toggling, so each half-period is
+    -- counts_per_freq * c_clock_period.
+
+    function half_period_for (
+      combo : integer
+    ) return time is
+    begin
+
+      case combo is
+
+        when 0 =>
+
+          return 5 ms;   -- 100 Hz: 125_000 * 40 ns
+
+        when 1 =>
+
+          return 10 ms;  -- 50 Hz:  250_000 * 40 ns
+
+        when 2 =>
+
+          return 50 ms;  -- 10 Hz:  1_250_000 * 40 ns
+
+        when 3 =>
+
+          return 500 ms; -- 1 Hz:   12_500_000 * 40 ns
+
+        when others =>
+
+          return 0 ns;
+
+      end case;
+
+    end function half_period_for;
+
+    -- Pulses reset and leaves the DUT in a known running state.
+    -- Called before each random iteration so the counters start from zero.
+
+    procedure reset_dut is
+    begin
+
+      r_reset  <= '1';
+      r_enable <= '0';
+      wait until rising_edge(r_clock);
+      wait until rising_edge(r_clock);
+      r_reset  <= '0';
+      r_enable <= '1';
+      -- One more edge so the first counter increment has committed before
+      -- we start checking output.
+      wait until rising_edge(r_clock);
+
+    end procedure reset_dut;
+
+  begin
+
+    test_runner_setup(runner, runner_cfg);
+
+    -- Seed with instance name for reproducible runs.  Remove this line to get
+    -- a different random sequence each simulation.
+    rv.InitSeed(rv'instance_name);
+
+    while test_suite loop
+
+      if run("random blink coverage") then
+        v_switch_cov := NewID("switch_combinations");
+        AddBins(v_switch_cov, "100Hz (SW=00)", GenBin(0));
+        AddBins(v_switch_cov, "50Hz  (SW=01)", GenBin(1));
+        AddBins(v_switch_cov, "10Hz  (SW=10)", GenBin(2));
+        AddBins(v_switch_cov, "1Hz   (SW=11)", GenBin(3));
+
+        -- Drive random switch combinations until every bin has been hit at
+        -- least once.  With 4 bins the expected iteration count is ~8.3
+        -- (coupon collector), but the 1 Hz case makes each iteration
+        -- expensive.  See note above about simulation time.
+        while not IsCovered(v_switch_cov) loop
+
+          v_combo    := rv.RandInt(0, 3);
+          r_switch_1 <= std_logic(to_unsigned(v_combo, 2)(1));
+          r_switch_2 <= std_logic(to_unsigned(v_combo, 2)(0));
+
+          reset_dut;
+
+          -- Record where this iteration started so timing checks are
+          -- relative, not absolute.
+          v_start := now;
+
+          -- LED must remain low for the first half-period.
+          while (now - v_start) < half_period_for(v_combo) loop
+
+            check_equal(w_led_drive, '0',
+                        "LED unexpectedly high during low phase (combo=" &
+                        integer'image(v_combo) & ")");
+            wait until rising_edge(r_clock);
+
+          end loop;
+
+          -- LED must be high for the second half-period.
+          while (now - v_start) < 2 * half_period_for(v_combo) loop
+
+            check_equal(w_led_drive, '1',
+                        "LED unexpectedly low during high phase (combo=" &
+                        integer'image(v_combo) & ")");
+            wait until rising_edge(r_clock);
+
+          end loop;
+
+          ICover(v_switch_cov, v_combo);
+
+        end loop;
+
+        WriteBin(v_switch_cov);
+      end if;
+
+    end loop;
+
+    clock_run <= false;
+    test_runner_cleanup(runner);
+
+  end process main;
+
+end architecture behave;
