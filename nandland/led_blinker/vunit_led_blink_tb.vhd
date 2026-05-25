@@ -71,6 +71,22 @@ begin
   main : process is
 
     variable v_switch_cov : coverageidtype;
+    variable v_cross_cov  : coverageidtype;
+
+    procedure wait_until_time (
+      constant t           : in time;
+      constant drive_level : in std_logic
+    ) is
+    begin
+
+      while now < t loop
+
+        check_equal(w_led_drive, drive_level);
+        wait until rising_edge(r_clock);
+
+      end loop;
+
+    end procedure wait_until_time;
 
     procedure run_blink_test (
       constant switch_1  : in std_logic;
@@ -85,41 +101,60 @@ begin
 
       v_switch_combo := to_integer(unsigned(std_logic_vector'(switch_1 & switch_2)));
       ICover(v_switch_cov, v_switch_combo);
+      ICover(v_cross_cov, (v_switch_combo, 1));
 
       r_reset    <= '0';
       r_enable   <= '1';
       r_switch_1 <= switch_1;
       r_switch_2 <= switch_2;
 
-      check_equal(w_led_drive, '0');
-
       -- Starts off for half the blink
-      while now < low_time loop
-
-        check_equal(w_led_drive, '0');
-        wait until rising_edge(r_clock);
-
-      end loop;
+      wait_until_time(low_time, '0');
 
       -- Should now be on for the other half
-      while now < high_time loop
-
-        check_equal(w_led_drive, '1');
-        wait until rising_edge(r_clock);
-
-      end loop;
+      wait_until_time(high_time, '1');
 
       check_equal(w_led_drive, '0');
       clock_run <= false;
 
     end procedure run_blink_test;
 
+    procedure run_off_test (
+      constant switch_1 : in std_logic;
+      constant switch_2 : in std_logic;
+      constant low_time : in time
+    ) is
+
+      variable v_switch_combo : integer;
+
+    begin
+
+      v_switch_combo := to_integer(unsigned(std_logic_vector'(switch_1 & switch_2)));
+      ICover(v_switch_cov, v_switch_combo);
+      ICover(v_cross_cov, (v_switch_combo,0));
+
+      r_reset    <= '0';
+      r_enable   <= '0';
+      r_switch_1 <= switch_1;
+      r_switch_2 <= switch_2;
+
+      -- Starts off for half the blink
+      wait_until_time(low_time, '0');
+
+      -- Should remain off
+      check_equal(w_led_drive, '0');
+      clock_run <= false;
+
+    end procedure run_off_test;
+
   begin
 
     test_runner_setup(runner, runner_cfg);
 
-    -- NewID registers this coverage model with the singleton and returns a handle.
+    v_cross_cov  := NewID("all_combinations");
     v_switch_cov := NewID("switch_combinations");
+
+    AddCross(v_cross_cov, GenBin(0, 3), GenBin(0, 1));
     AddBins(v_switch_cov, "100Hz (SW=00)", GenBin(0));
     AddBins(v_switch_cov, "50Hz  (SW=01)", GenBin(1));
     AddBins(v_switch_cov, "10Hz  (SW=10)", GenBin(2));
@@ -135,6 +170,14 @@ begin
         run_blink_test('1', '0', 50 ms, 100 ms);
       elsif run("1Hz blink") then
         run_blink_test('1', '1', 500 ms, 1000 ms);
+      elsif run("100Hz off") then
+        run_off_test('0', '0', 5 ms);
+      elsif run("50Hz off") then
+        run_off_test('0', '1', 10 ms);
+      elsif run("10Hz off") then
+        run_off_test('1', '0', 50 ms);
+      elsif run("1Hz off") then
+        run_off_test('1', '1', 500 ms);
       end if;
 
     end loop;
