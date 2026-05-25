@@ -2,9 +2,14 @@
 """Test runner using VUnit"""
 from pathlib import Path
 
-from vunit import VUnit
+from vunit import VUnit, VUnitCLI
+from vunit.ui import Results
 
-vu = VUnit.from_argv(compile_builtins=False)
+cli = VUnitCLI()
+cli.parser.add_argument("--with-coverage", action="store_true")
+args = cli.parse_args()
+
+vu = VUnit.from_args(args, compile_builtins=False)
 vu.add_vhdl_builtins()
 vu.add_osvvm()
 
@@ -23,4 +28,13 @@ files.set_compile_option(
     ["-Wall"]
 )
 
-vu.main()
+if args.with_coverage:
+    lib.set_compile_option("enable_coverage", True)
+    lib.set_sim_option("enable_coverage", True)
+
+def post_run(results: Results):
+    """Post run actions."""
+    if args.with_coverage:
+        results.merge_coverage(file_name="coverage_merged")
+
+vu.main(post_run=post_run)

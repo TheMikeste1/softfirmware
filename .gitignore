@@ -8,5 +8,7 @@
 *.vcd
 *_tb
 *_testbench
+*.gcov
 .venv_ghdl/
 vunit_out/
+coverage_merged/
