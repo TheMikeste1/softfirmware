@@ -21,12 +21,19 @@ vu.set_compile_option(
 
 lib = vu.add_library("led_blink")
 
-project_dir = Path(__file__).parent
-files = lib.add_source_files(project_dir / "*.vhd")
-files.set_compile_option(
-    "ghdl.a_flags",
-    ["-Wall"]
-)
+def add_source_files_from_dir(path: Path):
+    """Adds all source files in a directory and its subdirectories and sets common options."""
+    files = lib.add_source_files(path / "**" / "*.vhd")
+    files.set_compile_option(
+        "ghdl.a_flags",
+        ["-Wall"]
+    )
+
+project_root = Path(__file__).parent.parent
+src_root = project_root / "src"
+tb_root = project_root / "tb"
+add_source_files_from_dir(src_root)
+add_source_files_from_dir(tb_root)
 
 if args.with_coverage:
     lib.set_compile_option("enable_coverage", True)

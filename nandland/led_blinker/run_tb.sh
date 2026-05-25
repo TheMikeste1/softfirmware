@@ -6,7 +6,7 @@ script_dir="$(dirname -- "${BASH_SOURCE[0]:-$0}")" && readonly script_dir
 cd "$script_dir"
 
 echo "Analyze VHD"
-ghdl -a led_blink.vhd led_blink_tb.vhd
+ghdl -a src/led_blink.vhd tb/led_blink_tb.vhd.disabled
 
 echo "Elaborate TB"
 ghdl -e led_blink_tb
