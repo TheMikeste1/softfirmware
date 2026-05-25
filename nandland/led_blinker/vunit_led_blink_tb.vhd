@@ -59,6 +59,7 @@ begin
 
       r_clock <= '0';
       wait for c_clock_period / 2;
+
       r_clock <= '1';
       wait for c_clock_period / 2;
 
@@ -69,6 +70,44 @@ begin
   end process clk_proc;
 
   main : process is
+
+    procedure run_blink_test (
+      constant switch_1  : in std_logic;
+      constant switch_2  : in std_logic;
+      constant low_time  : in time;
+      constant high_time : in time
+    ) is
+    begin
+
+      -- Set the stimulus
+      r_reset    <= '0';
+      r_enable   <= '1';
+      r_switch_1 <= switch_1;
+      r_switch_2 <= switch_2;
+
+      check_equal(w_led_drive, '0');
+
+      -- Starts off for half the blink
+      while now < low_time loop
+
+        check_equal(w_led_drive, '0');
+        wait until rising_edge(r_clock);
+
+      end loop;
+
+      -- Should now be on for the other half
+      while now < high_time loop
+
+        check_equal(w_led_drive, '1');
+        wait until rising_edge(r_clock);
+
+      end loop;
+
+      check_equal(w_led_drive, '0');
+      clock_run <= false;
+
+    end procedure run_blink_test;
+
   begin
 
     test_runner_setup(runner, runner_cfg);
@@ -76,22 +115,13 @@ begin
     while test_suite loop
 
       if run("100Hz blink") then
-        r_reset  <= '0';
-        r_enable <= '1';
-
-        r_switch_1 <= '0';
-        r_switch_2 <= '0';
-
-        check_equal(w_led_drive, '0');
-
-        for i in 0 to 125_000 loop
-
-          check_equal(w_led_drive, '0');
-          wait until rising_edge(r_clock);
-
-        end loop;
-
-        check_equal(w_led_drive, '1');
+        run_blink_test('0', '0', 5 ms, 10 ms);
+      elsif run("50Hz blink") then
+        run_blink_test('0', '1', 10 ms, 20 ms);
+      elsif run("10Hz blink") then
+        run_blink_test('1', '0', 50 ms, 100 ms);
+      elsif run("1Hz blink") then
+        run_blink_test('1', '1', 500 ms, 1000 ms);
       end if;
 
     end loop;
