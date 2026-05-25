@@ -17,43 +17,43 @@ end entity led_blink_tb;
 architecture behave of led_blink_tb is
 
   -- 25 MHz = 40 nanoseconds period
-  constant c_clock_period : time := 40 ns;
+  constant c_CLOCK_PERIOD : time := 40 ns;
 
   -- vsg_off signal_007
-  signal clock_run   : boolean    := true;
+  signal r_clock_run : boolean    := true;
   signal r_clock     : std_ulogic := '0';
   signal r_reset     : std_ulogic := '1';
   signal r_enable    : std_ulogic := '0';
   signal r_switch_1  : std_ulogic := '0';
   signal r_switch_2  : std_ulogic := '0';
   signal w_led_drive : std_ulogic;
-  -- vsg_on signal_007
+-- vsg_on signal_007
 
-  -- Uncomment for indirect component instantiation
-  -- component led_blink is
-  --   port (
-  --     i_clock     : in    std_logic;
-  --     i_reset     : in    std_logic;
-  --     i_enable    : in    std_logic;
-  --     i_switch_1  : in    std_logic;
-  --     i_switch_2  : in    std_logic;
-  --     o_led_drive : out   std_logic
-  --   );
-  -- end component led_blink;
+-- Uncomment for indirect component instantiation
+-- component led_blink is
+--   port (
+--     i_clock     : in    std_logic;
+--     i_reset     : in    std_logic;
+--     i_enable    : in    std_logic;
+--     i_switch_1  : in    std_logic;
+--     i_switch_2  : in    std_logic;
+--     o_led_drive : out   std_logic
+--   );
+-- end component led_blink;
 
 begin
 
   -- Uncomment for direct component instantiation
   -- `work` is the default name for the working library
-  uut: entity work.led_blink
-   port map(
+  uut : entity work.led_blink(rtl)
+    port map (
       i_clock     => r_clock,
       i_reset     => r_reset,
       i_enable    => r_enable,
       i_switch_1  => r_switch_1,
       i_switch_2  => r_switch_2,
       o_led_drive => w_led_drive
-  );
+    );
 
   -- Uncomment for indirect component instantiation
   -- uut : component led_blink
@@ -69,12 +69,12 @@ begin
   clk_proc : process is
   begin
 
-    while clock_run loop
+    while r_clock_run loop
 
       r_clock <= '0';
-      wait for c_clock_period / 2;
+      wait for c_CLOCK_PERIOD / 2;
       r_clock <= '1';
-      wait for c_clock_period / 2;
+      wait for c_CLOCK_PERIOD / 2;
 
     end loop;
 
@@ -84,8 +84,8 @@ begin
 
   main : process is
 
-    variable v_switch_cov : coverageidtype;
-    variable v_cross_cov  : coverageidtype;
+    variable v_switch_cov : CoverageIDType;
+    variable v_cross_cov  : CoverageIDType;
 
     procedure wait_until_time (
       constant t           : in time;
@@ -129,7 +129,7 @@ begin
       wait_until_time(high_time, '1');
 
       check_equal(w_led_drive, '0');
-      clock_run <= false;
+      r_clock_run <= false;
 
     end procedure run_blink_test;
 
@@ -157,7 +157,7 @@ begin
 
       -- Should remain off
       check_equal(w_led_drive, '0');
-      clock_run <= false;
+      r_clock_run <= false;
 
     end procedure run_off_test;
 
