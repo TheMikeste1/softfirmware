@@ -29,28 +29,42 @@ architecture behave of led_blink_tb is
   signal w_led_drive : std_ulogic;
   -- vsg_on signal_007
 
-  component led_blink is
-    port (
-      i_clock     : in    std_logic;
-      i_reset     : in    std_logic;
-      i_enable    : in    std_logic;
-      i_switch_1  : in    std_logic;
-      i_switch_2  : in    std_logic;
-      o_led_drive : out   std_logic
-    );
-  end component led_blink;
+  -- Uncomment for indirect component instantiation
+  -- component led_blink is
+  --   port (
+  --     i_clock     : in    std_logic;
+  --     i_reset     : in    std_logic;
+  --     i_enable    : in    std_logic;
+  --     i_switch_1  : in    std_logic;
+  --     i_switch_2  : in    std_logic;
+  --     o_led_drive : out   std_logic
+  --   );
+  -- end component led_blink;
 
 begin
 
-  uut : component led_blink
-    port map (
+  -- Uncomment for direct component instantiation
+  -- `work` is the default name for the working library
+  uut: entity work.led_blink
+   port map(
       i_clock     => r_clock,
       i_reset     => r_reset,
       i_enable    => r_enable,
       i_switch_1  => r_switch_1,
       i_switch_2  => r_switch_2,
       o_led_drive => w_led_drive
-    );
+  );
+
+  -- Uncomment for indirect component instantiation
+  -- uut : component led_blink
+  --   port map (
+  --     i_clock     => r_clock,
+  --     i_reset     => r_reset,
+  --     i_enable    => r_enable,
+  --     i_switch_1  => r_switch_1,
+  --     i_switch_2  => r_switch_2,
+  --     o_led_drive => w_led_drive
+  --   );
 
   clk_proc : process is
   begin
