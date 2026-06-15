@@ -18,7 +18,7 @@ architecture rtl of led_blink is
   constant c_COUNTS_PER_100HZ : natural := 125_000;    -- The number of counts per 100Hz
   constant c_COUNTS_PER_50HZ  : natural := 250_000;    -- The number of counts per 50Hz
   constant c_COUNTS_PER_10HZ  : natural := 1_250_000;  -- The number of counts per 10Hz
-  constant c_COUNTS_PER_1_HZ  : natural := 12_500_000; -- The number of counts per 1Hz
+  constant c_COUNTS_PER_1HZ   : natural := 12_500_000; -- The number of counts per 1Hz
 
   signal r_counts_100hz : natural range 0 to c_COUNTS_PER_100HZ; -- Counter for 100Hz clock
   signal r_counts_50hz  : natural range 0 to c_COUNTS_PER_50HZ;  -- Counter for 50Hz clock
