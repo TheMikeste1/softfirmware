@@ -1,0 +1,8 @@
+test:
+  fusesoc run --target test personal:vhdl_workshop:lab_1
+
+gtkwave:
+  flatpak run io.github.gtkwave.GTKWave --dark ./build/personal_vhdl_workshop_lab_1_*/test-ghdl/wave.ghw >/dev/null 2>&1 &
+
+clean:
+  rm -rf build

@@ -1,1 +1,2 @@
 vunit_hdl==4.7.1
+fusesoc~=2.4.6
