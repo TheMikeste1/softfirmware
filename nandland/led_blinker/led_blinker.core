@@ -1,0 +1,39 @@
+CAPI=2:
+# yaml-language-server: $schema=../../fusesoc_schema.json
+# <https://fusesoc.readthedocs.io/en/stable/user/build_system/core_files.html>
+name: personal:nandland:led_blinker:0.0.0
+description: ""
+
+filesets:
+  src:
+    files:
+      - src/led_blink.vhd
+    file_type: vhdlSource
+  test:
+    files:
+      - tb/vunit_led_blink_tb.vhd
+    file_type: vhdlSource
+  runner:
+    files:
+      - vunit_runner.py
+    file_type: pythonSource
+
+targets:
+  default: &default
+    filesets:
+      - src
+    default_tool: ghdl
+    tools:
+      ghdl:
+        analyze_options: [--std=08, --warn-reserved, --warn-unused]
+
+  test:
+    <<: *default
+    filesets_append:
+      - test
+      - runner
+    toplevel: tb_disp_mux
+    default_tool: vunit
+    tools:
+      vunit:
+        vunit_runner: vunit_runner.py

@@ -1,0 +1,8 @@
+test:
+  fusesoc run --target test personal:nandland:led_blinker
+
+gtkwave:
+  flatpak run io.github.gtkwave.GTKWave --dark ./build/personal_nandland_led_blinker*/test-ghdl/wave.ghw >/dev/null 2>&1 &
+
+clean:
+  rm -rf build
