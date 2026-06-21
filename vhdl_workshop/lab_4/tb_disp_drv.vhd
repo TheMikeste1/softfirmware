@@ -1,5 +1,3 @@
--- vsg_off signal_007
-
 library ieee;
   use ieee.std_logic_1164.all;
   use work.p_display.all;
@@ -18,13 +16,17 @@ architecture test of tb_disp_drv is
     );
   end component disp_drv;
 
+  -- vsg_off signal_007
   signal w_error     : std_ulogic := '0';
   signal w_show_time : std_ulogic := '0';
-  signal w_no_pics   : TDigits;
-  signal w_exp_time  : TDigits;
-  signal w_display   : TDisplay;
+  -- vsg_on signal_007
+
+  signal w_no_pics  : TDigits;
+  signal w_exp_time : TDigits;
+  signal w_display  : TDisplay;
 
 begin
+
   -- vsg_off instantiation_034
   dut : component disp_drv
     port map (
@@ -38,78 +40,67 @@ begin
 
   stimuli : process is
   begin
-
     wait for 30 ns;
-    assert w_display = c_SEG_0;
+    assert w_display = (SEG_0, SEG_0, SEG_0);
 
-    w_no_pics  <= 0;
-    w_exp_time <= 5;
+    w_no_pics  <= (0, 0, 0);
+    w_exp_time <= (5, 0, 0);
     wait for 20 ns;
     -- no changes
-    assert w_display = c_SEG_0;
+    assert w_display = (SEG_0, SEG_0, SEG_0);
 
     for i in 1 to 10 loop
-      w_no_pics <= i;
+      w_no_pics <= (0, 0, I);
       wait for 20 ns;
-      -- DISPLAY = 1..E (03,6D,67,53,76,7E,23,7F,77,7C)
+      -- DISPLAY = (0,0,1)..(0,0,E)
       case i is
-        when 1 =>
-          assert w_display = c_SEG_1;
-        when 2 =>
-          assert w_display = c_SEG_2;
-        when 3 =>
-          assert w_display = c_SEG_3;
-        when 4 =>
-          assert w_display = c_SEG_4;
-        when 5 =>
-          assert w_display = c_SEG_5;
-        when 6 =>
-          assert w_display = c_SEG_6;
-        when 7 =>
-          assert w_display = c_SEG_7;
-        when 8 =>
-          assert w_display = c_SEG_8;
-        when 9 =>
-          assert w_display = c_SEG_9;
-        when others =>
-          assert w_display = c_SEG_E;
+        when 1 => assert w_display = (SEG_0, SEG_0, SEG_1);
+        when 2 => assert w_display = (SEG_0, SEG_0, SEG_2);
+        when 3 => assert w_display = (SEG_0, SEG_0, SEG_3);
+        when 4 => assert w_display = (SEG_0, SEG_0, SEG_4);
+        when 5 => assert w_display = (SEG_0, SEG_0, SEG_5);
+        when 6 => assert w_display = (SEG_0, SEG_0, SEG_6);
+        when 7 => assert w_display = (SEG_0, SEG_0, SEG_7);
+        when 8 => assert w_display = (SEG_0, SEG_0, SEG_8);
+        when 9 => assert w_display = (SEG_0, SEG_0, SEG_9);
+        when others => assert w_display = (SEG_0, SEG_0, SEG_E);
       end case;
     end loop;
 
     w_show_time <= '1';
     wait for 20 ns;
-    assert w_display = c_SEG_5;
+    assert w_display = (SEG_5, SEG_0, SEG_0);
 
-    w_exp_time <= 6;
-    w_no_pics  <= 4;
+    w_exp_time <= (0, 6, 0);
+    w_no_pics  <= (4, 0, 0);
     wait for 20 ns;
-    assert w_display = c_SEG_6;
+    assert w_display = (SEG_0, SEG_6, SEG_0);
 
     w_show_time <= '0';
     wait for 20 ns;
-    assert w_display = c_SEG_4;
+    assert w_display = (SEG_4, SEG_0, SEG_0);
 
     w_error <= '1';
     wait for 20 ns;
-    assert w_display = c_SEG_E;
+    assert w_display = (SEG_E, SEG_E, SEG_E);
 
     w_show_time <= '1';
     wait for 20 ns;
     -- no changes
-    assert w_display = c_SEG_E;
+    assert w_display = (SEG_E, SEG_E, SEG_E);
 
     w_error <= '0';
     wait for 20 ns;
-    assert w_display = c_SEG_6;
+    assert w_display = (SEG_0, SEG_6, SEG_0);
 
     w_show_time <= '0';
     wait for 20 ns;
-    assert w_display = c_SEG_4;
+    assert w_display = (SEG_4, SEG_0, SEG_0);
+
     wait;
   end process stimuli;
 
   display_digit(w_display);
-
 end architecture test;
 
 configuration CFG_TB_DISP_DRV of TB_DISP_DRV is
