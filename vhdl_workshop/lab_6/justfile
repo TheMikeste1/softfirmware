@@ -1,0 +1,10 @@
+lab_number := "6"
+
+test:
+  fusesoc run --target test personal:vhdl_workshop:lab_{{ lab_number }}
+
+gtkwave:
+  flatpak run io.github.gtkwave.GTKWave --dark ./build/personal_vhdl_workshop_lab_{{lab_number}}_*/test-ghdl/wave.ghw >/dev/null 2>&1 &
+
+clean:
+  rm -rf build
