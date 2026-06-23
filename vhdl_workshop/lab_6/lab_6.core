@@ -1,7 +1,7 @@
 CAPI=2:
 # yaml-language-server: $schema=../../fusesoc_schema.json
 # <https://fusesoc.readthedocs.io/en/stable/user/build_system/core_files.html>
-name: personal:vhdl_workshop:lab_5:0.0.0
+name: personal:vhdl_workshop:lab_6:0.0.0
 description: "Lab 6 from VHDL workshop. <https://www.vhdl-online.de/vhdl_workshop/lab_6>"
 
 filesets:

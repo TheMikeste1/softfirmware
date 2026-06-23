@@ -1,5 +1,6 @@
 library ieee;
   use ieee.std_logic_1164.all;
+  use work.p_display.TDigits;
 
 entity exp_ff is
   port (
@@ -13,13 +14,16 @@ end entity exp_ff;
 architecture rtl of exp_ff is
 begin
 
-  tick : process (clk) is
+  tick : process (clk, reset) is
   begin
     if (reset = '1') then
-    -- Assign a default value
-    elsif (clk'event and clk = '1') then
-    -- Check for new input values
+      -- Assign a default value
+      exp_time <= (0, 0, 1);
+    elsif rising_edge(clk) then
+      -- Check for new input values
+      if key /= (0, 0, 0) then
+        exp_time <= key;
+      end if;
     end if;
   end process tick;
 end architecture rtl;
-
