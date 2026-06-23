@@ -1,0 +1,34 @@
+CAPI=2:
+# yaml-language-server: $schema=../../fusesoc_schema.json
+# <https://fusesoc.readthedocs.io/en/stable/user/build_system/core_files.html>
+name: personal:vhdl_workshop:lab_7:0.0.0
+description: "Lab 7 from VHDL workshop. <https://www.vhdl-online.de/vhdl_workshop/lab_7>"
+
+filesets:
+  src:
+    files:
+      - disp_ctrl.vhd
+      - p_display.vhd
+    file_type: vhdlSource-2008
+  test:
+    files:
+      - tb_disp_ctrl.vhd
+    file_type: vhdlSource-2008
+
+targets:
+  default: &default
+    filesets:
+      - src
+    default_tool: ghdl
+    tools:
+      ghdl:
+        analyze_options: [--warn-reserved, --warn-unused]
+
+  test:
+    <<: *default
+    filesets_append:
+      - test
+    toplevel: tb_disp_ctrl
+    tools:
+      ghdl:
+        run_options: [--wave=wave.ghw]
