@@ -106,7 +106,7 @@ begin
   sample : process (w_show_time) is
     constant SPACE     : string := " ";
     variable file_line : line;
-    file     out_file  : TEXT open write_mode is "lab_6.trace";
+    file     out_file  : TEXT open write_mode is "lab_7.trace";
   begin
     write(file_line, to_bit(w_show_time));
     writeline(OUT_FILE, file_line);
