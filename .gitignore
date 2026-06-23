@@ -16,3 +16,4 @@ tb_*
 !tb_*.vhd
 fusesoc_schema.json
 build/
+activate
