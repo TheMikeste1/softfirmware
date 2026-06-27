@@ -1,0 +1,3 @@
+[submodule "vhdlweb"]
+	path = vhdlweb
+	url = git@github.com:stevenbell/vhdlweb.git
