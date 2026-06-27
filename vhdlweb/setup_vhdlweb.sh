@@ -16,7 +16,7 @@ docker_image="${docker_image%\"}"
 readonly docker_image
 docker pull "$docker_image"
 
-npm install -g netlistsvg # For diagrams
+sudo npm install -g netlistsvg # For diagrams
 
 if command -v getenforce &> /dev/null; then
   echo "Running SELinux, adding modules. . ."
