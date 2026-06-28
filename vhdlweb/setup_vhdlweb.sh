@@ -18,6 +18,9 @@ docker pull "$docker_image"
 
 sudo npm install -g netlistsvg # For diagrams
 
+git -C "$script_dir/vhdlweb" apply vhdlweb.patch
+git config submodule.vhdlweb.ignore dirty
+
 if command -v getenforce &> /dev/null; then
   echo "Running SELinux, adding modules. . ."
   cd "$script_dir" || {

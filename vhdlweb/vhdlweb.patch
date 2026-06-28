@@ -1,0 +1,26 @@
+diff --git a/data/problems/decrementmem/decrementmem_gold.vhd b/data/problems/decrementmem/decrementmem_gold.vhd
+index d8ba859..6e8a477 100644
+--- a/data/problems/decrementmem/decrementmem_gold.vhd
++++ b/data/problems/decrementmem/decrementmem_gold.vhd
+@@ -9,7 +9,7 @@ entity decrementmem is
+ 
+     -- Signals below are connected to the RAM inside the testbench
+     addr : out unsigned(3 downto 0);
+-    dataRead : out std_logic_vector(7 downto 0);
++    dataRead : in std_logic_vector(7 downto 0);
+     dataWrite : out std_logic_vector(7 downto 0);
+     writeEnable : out std_logic
+   );
+diff --git a/data/problems/decrementmem/testbench.vhd b/data/problems/decrementmem/testbench.vhd
+index 414b0b4..753326a 100644
+--- a/data/problems/decrementmem/testbench.vhd
++++ b/data/problems/decrementmem/testbench.vhd
+@@ -17,7 +17,7 @@ component decrementmem is
+ 
+     -- Signals below are connected to the RAM inside the testbench
+     addr : out unsigned(3 downto 0);
+-    dataRead : out std_logic_vector(7 downto 0);
++    dataRead : in std_logic_vector(7 downto 0);
+     dataWrite : out std_logic_vector(7 downto 0);
+     writeEnable : out std_logic
+   );
