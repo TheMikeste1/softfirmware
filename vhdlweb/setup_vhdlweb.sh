@@ -25,16 +25,23 @@ if command -v getenforce &> /dev/null; then
     exit 1
   }
 
-  checkmodule -M -m -o vhdlweb-make.mod vhdlweb-make.te
-  semodule_package -o vhdlweb-make.pp -m vhdlweb-make.mod
-
   checkmodule -M -m -o vhdlweb-ghdl.mod vhdlweb-ghdl.te
   semodule_package -o vhdlweb-ghdl.pp -m vhdlweb-ghdl.mod
 
-  sudo semodule -X 300 -i vhdlweb-make.pp
-  sudo semodule -X 300 -i vhdlweb-ghdl.pp
+  checkmodule -M -m -o vhdlweb-make.mod vhdlweb-make.te
+  semodule_package -o vhdlweb-make.pp -m vhdlweb-make.mod
 
-  rm vhdlweb-ghdl.mod vhdlweb-make.mod vhdlweb-ghdl.pp vhdlweb-make.pp
+  checkmodule -M -m -o vhdlweb-sh.mod vhdlweb-sh.te
+  semodule_package -o vhdlweb-sh.pp -m vhdlweb-sh.mod
+
+  sudo semodule -X 300 -i vhdlweb-ghdl.pp
+  sudo semodule -X 300 -i vhdlweb-make.pp
+  sudo semodule -X 300 -i vhdlweb-sh.pp
+
+  rm \
+    vhdlweb-ghdl.mod vhdlweb-ghdl.pp \
+    vhdlweb-make.mod vhdlweb-make.pp \
+    vhdlweb-sh.mod vhdlweb-sh.pp
 fi
 
 echo "VHDL web ready; run $script_dir/vhdlweb/deploy"

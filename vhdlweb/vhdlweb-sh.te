@@ -1,0 +1,14 @@
+
+module vhdlweb-sh 1.0;
+
+require {
+	type user_tmp_t;
+	type container_t;
+	class file { execute execute_no_trans };
+}
+
+#============= container_t ==============
+
+#!!!! This avc is allowed in the current policy
+allow container_t user_tmp_t:file execute;
+allow container_t user_tmp_t:file execute_no_trans;
