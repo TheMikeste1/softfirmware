@@ -17,3 +17,5 @@ tb_*
 fusesoc_schema.json
 build/
 activate
+*.json
+*.svg
